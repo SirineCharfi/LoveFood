@@ -1,0 +1,90 @@
+<div class="container"
+    fxLayout="row"
+    fxLayout.sm="column"
+    fxLayout.xs="column"
+    fxLayoutAlign.gt-md="space-around center"
+    fxLayoutGap="10px" 
+    fxLayoutGap.xs="0">
+<!-- description et presentation du plat avec une animation lors du chargement des inforamtions du backend -->
+  <div fxFlex="40" *ngIf="dish"   [@visibility]="visibility" [@expand]>  
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>
+          <h3>{{dish.name | uppercase}}</h3>
+        </mat-card-title>
+      </mat-card-header>
+      <img mat-card-image src="{{BaseURL + dish.image}}" alt={{dish.name}}>
+      <mat-card-content>
+        <p>{{dish.description}}
+        </p>
+      </mat-card-content>
+      <mat-card-actions>
+        <!-- deux boutons pour retourner au plat précedent au avancer au plat suivant -->
+        <button mat-button [routerLink]="['/dishdetail', prev]">
+          <span class="fa fa-chevron-left fa-lg"></span>
+        </button>
+        <button mat-button (click)="goBack()">BACK</button>
+        <button mat-button>LIKE</button>
+        <button mat-button>SHARE</button>
+        <span class="flex-spacer"></span>
+        <button mat-button [routerLink]="['/dishdetail', next]">
+          <span class="fa fa-chevron-right fa-lg"></span>
+        </button>
+      </mat-card-actions>
+     
+    </mat-card>
+  
+ 
+  </div>
+<!-- pour charger les commentaire deja enregistré sur le plat avec une animations lors du chargement de ces commentaires -->
+  <div fxFlex="40">
+    <h3><b> Comments </b></h3>
+    <div fxFlex *ngIf="dish"   [@visibility]="visibility" [@expand]>
+      <mat-list>
+     <mat-list-item  *ngFor="let item of dish.comments"  style="padding-top:10% ;">  
+        <p>
+          <span>{{item.comment}}</span><br>
+          <span>{{item.rating}} Stars</span><br>
+          <span>-- {{item.author}} {{item.date | date}}</span></p>
+         
+      </mat-list-item>
+    </mat-list>
+    <!-- pour ajouter une ou plusieurs commentaires sur le plats et elle sera enregistrée avec la date du jour avec les controles sur les champs et le boutons avant de soumettre -->
+  <form   novalidate [formGroup]="CommentsForm"  (ngSubmit)="onSubmit()" >
+    <mat-list *ngIf="CommentsForm.valid" style="padding-top:10% ;">
+      <mat-list-item>
+        <p>
+        <span>{{CommentsForm.value.comment|uppercase}}</span><br>
+          <span>{{CommentsForm.value.rating}} Stars</span><br>
+          <span>-- {{CommentsForm.value.author|uppercase}}</span></p>
+      </mat-list-item>
+    </mat-list>
+    <p>
+        <mat-form-field class="half-width">
+          <input matInput formControlName="author" placeholder=" Name" type="text" required>
+          <mat-error *ngIf="formErrors.author">{{formErrors.author}}</mat-error>
+         </mat-form-field>
+      </p>
+      <p>
+        <mat-slider formControlName="rating"  min="1" max="5"  value="1" thumbLabel tickInterval="1" ></mat-slider>
+      </p>
+      <p>
+        <mat-form-field class="full-width">
+          <textarea matInput formControlName="comment" placeholder="Your comment" rows=12 required></textarea>
+          <mat-error *ngIf="formErrors.comment">{{formErrors.comment}}</mat-error>
+        </mat-form-field>
+      </p>
+      <button type="submit" mat-button class="background-primary text-floral-white" [disabled]="CommentsForm.invalid" >Submit</button>
+    </form>
+    </div>
+  </div> 
+    
+    <!-- un msg sera affiché lors d'un erreur (si le serveur ne fonctionne pas ) ou bien le plat sera affiché apres l'extraction de ses info from du back -->
+    <div [hidden]="dish || errMess">
+      <mat-spinner></mat-spinner><h4>Loading . . . Please Wait</h4>
+    </div>
+    <div fxFlex *ngIf="errMess">
+      <h2>Error</h2>
+      <h4>{{errMess}}</h4>
+    </div>
+</div>
